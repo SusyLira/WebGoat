@@ -1,16 +1,9 @@
 pipeline {
   agent any
-  environment {
-      SEMGREP_APP_TOKEN = credentials('SEMGREP_APP_TOKEN')
-  }
-    stages {
-    stage('Semgrep-Scan') {
+  stages {
+    stage('scan') {
       steps {
-        sh '''docker pull returntocorp/semgrep && \
-        docker run \
-        -e SEMGREP_APP_TOKEN=$SEMGREP_APP_TOKEN \
-        -v "$(pwd):$(pwd)" --workdir $(pwd) \
-        returntocorp/semgrep semgrep ci '''
+        sh "docker run -v ${WORKSPACE}:/src --workdir /src returntocorp/semgrep-agent:v1 semgrep-agent --config p/ci --config p/security-audit --config p/secrets"
       }
     }
   }
